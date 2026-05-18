@@ -27,6 +27,10 @@ router.get('/high-gdp-loss', (req, res, next) => { req.query.gdpLossAbove = 30; 
 router.get('/black-market/high', (req, res, next) => { req.query.blackMarket = 'High'; next(); }, conflictController.getConflicts);
 
 
+// Anti-Gravity Mode Routes
+router.get('/toggle', conflictController.getAntiGravityToggle);
+router.get('/analytics', conflictController.getAntiGravityAnalytics);
+
 // Parametric GET queries
 router.get('/name/:name', conflictController.getByField('name'));
 router.get('/type/:type', conflictController.getByField('type'));
