@@ -5,11 +5,13 @@ const { protect } = require('../middlewares/authMiddleware');
 
 router.post('/register', authController.registerUser);
 router.post('/login', authController.loginUser);
+router.post('/google', authController.googleAuth);
 router.post('/logout', protect, authController.logout);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
 router.post('/refresh-token', protect, authController.refreshToken);
 router.get('/me', protect, authController.getMe);
+router.put('/profile', protect, authController.updateProfile);
 router.delete('/account', protect, authController.deleteAccount);
 
 module.exports = router;
