@@ -241,3 +241,88 @@ exports.getTopConflicts = (field, sortDir = -1) => async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// --- Anti-Gravity Feature Endpoints ---
+exports.getAntiGravityToggle = async (req, res, next) => {
+  try {
+    let conflicts = await Conflict.find();
+    
+    if (req.query.simulate === 'true') {
+      let payload = conflicts.map(conflict => {
+        let doc = conflict.toObject();
+        
+        // Dynamically flip gdpLoss (negative impacts flip to positive recoveries)
+        if (doc.gdpLoss) {
+          doc.gdpLoss = Math.abs(doc.gdpLoss); 
+        }
+        
+        // Mathematically reduce runaway inflation based on an exponential deceleration formula
+        if (doc.inflation && doc.inflation > 10) {
+          doc.inflation = parseFloat((Math.log(doc.inflation) * 2).toFixed(2));
+        } else if (doc.inflation && doc.inflation < 0) {
+          doc.inflation = Math.abs(doc.inflation);
+        }
+        
+        return doc;
+      });
+      
+      // Added antiGravitySimulated: true header flag
+      res.setHeader('antiGravitySimulated', 'true');
+      return res.status(200).json(payload);
+    }
+    
+    res.status(200).json(conflicts);
+  } catch (error) {
+    if (next) next(error);
+    else res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAntiGravityAnalytics = async (req, res, next) => {
+  try {
+    const analytics = await Conflict.aggregate([
+      {
+        $match: { region: { $exists: true, $ne: null } }
+      },
+      {
+        $group: {
+          _id: "$region",
+          totalCostOfWar: { $sum: "$costOfWar" },
+          averageInflation: { $avg: "$inflation" },
+          totalGdpLoss: { $sum: "$gdpLoss" },
+          totalReconstructionCost: { $sum: "$reconstructionCost" }
+        }
+      },
+      {
+        $project: {
+          region: "$_id",
+          _id: 0,
+          totalCostOfWar: 1,
+          totalGdpLoss: 1,
+          totalReconstructionCost: 1,
+          averageInflation: { $round: ["$averageInflation", 2] },
+          regionalRecoveryIndex: {
+            $cond: {
+              if: { $gt: ["$totalReconstructionCost", 0] },
+              then: { 
+                $divide: [ 
+                  { $multiply: ["$totalGdpLoss", -1] }, 
+                  "$totalReconstructionCost" 
+                ] 
+              },
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $sort: { regionalRecoveryIndex: -1 } // Sort regions descending by their recovery readiness score
+      }
+    ]);
+
+    res.status(200).json(analytics);
+  } catch (error) {
+    if (next) next(error);
+    else res.status(500).json({ message: error.message });
+  }
+};

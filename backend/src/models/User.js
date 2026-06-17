@@ -16,7 +16,16 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false, // Optional for Google OAuth users
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null values while maintaining uniqueness
+  },
+  avatar: {
+    type: String,
+    default: '',
   },
   isAdmin: {
     type: Boolean,
