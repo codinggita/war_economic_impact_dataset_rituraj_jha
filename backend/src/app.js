@@ -11,6 +11,8 @@ const authRoutes = require('./routes/authRoutes');
 const jwtRoutes = require('./routes/jwtRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const protectedRoutes = require('./routes/protectedRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use('/auth', authLimiter, authRoutes);
 app.use('/jwt', jwtRoutes);
 app.use('/admin', adminRoutes);
 app.use('/protected', protectedRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.use('/conflicts', conflictRoutes);
 app.use('/', recordRoutes); // /regions, /countries, /economic-records, etc.
