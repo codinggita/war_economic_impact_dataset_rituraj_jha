@@ -298,6 +298,8 @@ exports.getAntiGravityAnalytics = async (req, res, next) => {
           region: "$_id",
           _id: 0,
           totalCostOfWar: 1,
+          totalGdpLoss: 1,
+          totalReconstructionCost: 1,
           averageInflation: { $round: ["$averageInflation", 2] },
           regionalRecoveryIndex: {
             $cond: {
