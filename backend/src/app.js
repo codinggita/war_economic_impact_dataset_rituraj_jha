@@ -13,6 +13,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const protectedRoutes = require('./routes/protectedRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const seedRoutes = require('./routes/seedRoutes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/admin', adminRoutes);
 app.use('/protected', protectedRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/seed', seedRoutes);
 
 app.use('/conflicts', conflictRoutes);
 app.use('/', recordRoutes); // /regions, /countries, /economic-records, etc.

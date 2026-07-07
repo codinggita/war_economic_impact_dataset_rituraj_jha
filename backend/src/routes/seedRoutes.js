@@ -1,10 +1,6 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const express = require('express');
+const router = express.Router();
 const Conflict = require('../models/Conflict');
-
-const path = require('path');
-// Load env vars
-dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const mockConflicts = [
   {
@@ -142,31 +138,15 @@ const mockConflicts = [
   }
 ];
 
-const seedDatabase = async () => {
+router.get('/', async (req, res) => {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/war_economic_impact';
-    console.log('Connecting to database:', uri);
-    
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
-    
-    console.log('MongoDB Connected...');
-
-    // Clear existing data
     await Conflict.deleteMany({});
-    console.log('Existing conflicts removed.');
-
-    // Insert mock data
     await Conflict.insertMany(mockConflicts);
-    console.log('Mock conflicts inserted successfully.');
-
-    process.exit();
+    res.status(200).json({ message: 'Database seeded successfully!' });
   } catch (error) {
-    console.error('Error with data import:', error);
-    process.exit(1);
+    console.error('Seed error:', error);
+    res.status(500).json({ error: 'Failed to seed database' });
   }
-};
+});
 
-seedDatabase();
+module.exports = router;
